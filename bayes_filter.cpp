@@ -45,12 +45,12 @@ public:
     /*=TODO - INSERT-CHANGE CODE HERE IF NEEDED=*/
     // Initial belief distribution
     for (int i = 0; i<NUM_STATES; i++) { 
-	beliefStates.push_back(0); 
+	beliefStates.push_back(1.0/NUM_STATES); 
     };
     world[0][0] = 1;
     world[0][1] = 0;
     world[0][2] = 1;
-    world[0][0] = 0;
+    world[1][0] = 0;
     world[1][1] = 0;
     world[1][2] = 1;
     world[2][0] = 1;
@@ -191,28 +191,88 @@ public:
 
   /*=TODO - INSERT-CHANGE CODE HERE IF NEEDED=*/
   void updateMove() {
-    ROS_INFO("=========================");
-    ROS_INFO("Wall left: [%d]", wall_left);
-    ROS_INFO("Wall front: [%d]", wall_front);
-    ROS_INFO("Wall right: [%d]", wall_right);
-    std::vector<int> possibleStates;
-    for (int i = 0; i<NUM_STATES; i++) {
-      ROS_INFO("State %d [%d,%d,%d]",i,world[i][0],world[i][1],world[i][2]);
-      int sensor_left  = (wall_left)?1:0;
-      int sensor_front = (wall_front)?1:0;
-      int sensor_right = (wall_right)?1:0;
-      if (
-            sensor_left == world[i][0]
-        &&  sensor_front == world[i][1]
-        &&  sensor_right == world[i][2]
-        ) {
-          possibleStates.push_back(i);
-          ROS_INFO("Possible state: [%d]",i);
-          beliefStates[i]=1;
+    // Movement Model
+    // P(Xi | Xi) = 0.1
+    // P(Xi+1 | Xi) = 0.8
+    // P(Xi+2 | Xi) = 0.1
+
+    // ___
+    // bel(Xt) = S p(Xt | Ut, Xt-1)bel(Xt-1)dXt-1
+    // Ut from movement model
+    // var [movenoise] bool for movement noise
+
+    double newBeliefStates[NUM_STATES];
+    for (int i = 0; i < NUM_STATES; i++) 
+    {
+      // determine state transition probabilities 
+      // p(Xt | Ut, Xt-1)
+      double transProbs[NUM_STATES];
+      // with movement noise
+      if (movenoise) 
+      {
+        for (int j = 0; j < NUM_STATES; j++)
+        {
+          // P(Xi | Xi) = 0.1
+          if (j == i)
+            transProbs[j] = 0.1;
+          // P(Xi+1 | Xi) = 0.8
+          else if (j == (i+1))
+            transProbs[j] = 0.8;
+          // P(Xi+2 | Xi) = 0.1
+          else if (j == (i+2))
+            transProbs[j] = 0.1;
+
+          // can't face other direction after a move
+          if (
+                (i == 9   && j == 10)
+            ||  (i == 19  && j == 0 )
+            ||  (i == 8   && j == 10)
+            ||  (i == 18  && j == 0 ) 
+            )
+          {
+            transProbs[j] = 0;
+          }
+        }
       }
-  }
+      // without movement noise
+      else 
+      {
+        for (int j = 0; j < NUM_STATES; j++)
+        {
+          if (j == i + 1)
+            transProbs[j] = 1;
+          else
+            transProbs[j] = 0;
 
+          if (
+                (i == 9   && j == 10)
+            ||  (i == 19  && j == 0 )
+            )
+          {
+            transProbs[j] = 0;
+          }
+        }
+      }
+      // end transition probabilities
 
+      // calculate prediction
+      // ___
+      // bel(Xt) = S p(Xt | Ut, Xt-1)bel(Xt-1)dXt-1
+      // with p(Xt | Ut, Xt-1) = transProbs[j]
+      double sum = 0;
+      for (int j = 0; j < NUM_STATES; j++)
+      {
+        sum += transProbs[j] * beliefStates[j];
+      }
+      newBeliefStates[i] = sum;
+      ROS_INFO("Belief for state [%d] = [%f]",i,sum);
+    } 
+
+    // update the Belief states with the new calculated values
+    for (int i = 0; i < NUM_STATES; i++)
+    {
+      beliefStates[i] = newBeliefStates[i];
+    }     
   };
   /*==========================================*/
 
@@ -229,6 +289,16 @@ public:
 
 
   /*=TODO - INSERT-CHANGE CODE HERE IF NEEDED=*/
+
+  /*
+      ROS_INFO("=========================");
+      ROS_INFO("Wall left: [%d]", wall_left);
+      ROS_INFO("Wall front: [%d]", wall_front);
+      ROS_INFO("Wall right: [%d]", wall_right);
+      int sensor_left  = (wall_left)?1:0;
+      int sensor_front = (wall_front)?1:0;
+      int sensor_right = (wall_right)?1:0;
+  */
   void updateSensing() {
 
         // example routine, generates random beliefs
