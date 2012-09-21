@@ -197,7 +197,7 @@ public:
     ROS_INFO("Wall right: [%d]", wall_right);
     std::vector<int> possibleStates;
     for (int i = 0; i<NUM_STATES; i++) {
-      ROS_INFO("State %d [%d,%d,%d]",(i+1),world[i][0],world[i][1],world[i][2]);
+      ROS_INFO("State %d [%d,%d,%d]",i,world[i][0],world[i][1],world[i][2]);
       int sensor_left  = (wall_left)?1:0;
       int sensor_front = (wall_front)?1:0;
       int sensor_right = (wall_right)?1:0;
