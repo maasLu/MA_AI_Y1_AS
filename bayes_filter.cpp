@@ -192,9 +192,9 @@ public:
   /*=TODO - INSERT-CHANGE CODE HERE IF NEEDED=*/
   void updateMove() {
     // Movement Model
-    // P(Xi | Xi) = 0.1
-    // P(Xi+1 | Xi) = 0.8
-    // P(Xi+2 | Xi) = 0.1
+    // p(Xi | Xi) = 0.1
+    // p(Xi+1 | Xi) = 0.8
+    // p(Xi+2 | Xi) = 0.1
 
     // ___
     // bel(Xt) = S p(Xt | Ut, Xt-1)bel(Xt-1)dXt-1
@@ -281,8 +281,65 @@ public:
 
   /*=TODO - INSERT-CHANGE CODE HERE IF NEEDED=*/
   void updateTurn() {
+    // Turn Model
+    // p(N-Xi-1 | Xi) = 0.9 Added the minus 1, I think that's an error in the assignment, Rik
+    // p(Xi | Xi) = 0.1
 
+    // ___
+    // bel(Xt) = S p(Xt | Ut, Xt-1)bel(Xt-1)dXt-1
+    // Ut from turn model
+    // var [movenoise] bool for movement noise
 
+    double newBeliefStates[NUM_STATES];
+    for (int i = 0; i < NUM_STATES; i++) 
+    {
+      // determine state transition probabilities 
+      // p(Xt | Ut, Xt-1)
+      double transProbs[NUM_STATES];
+      // with movement noise
+      if (movenoise) 
+      {
+        for (int j = 0; j < NUM_STATES; j++)
+        {
+          // P(Xi | Xi) = 0.1
+          if (j == i)
+            transProbs[j] = 0.1;
+          // P(N-Xi-1 | Xi) = 0.9
+          else if (j == NUM_STATES - i - 1)
+            transProbs[j] = 0.9;
+        }
+      }
+      // without movement noise
+      else 
+      {
+        for (int j = 0; j < NUM_STATES; j++)
+        {
+          if (j == NUM_STATES - i - 1)
+            transProbs[j] = 1;
+          else
+            transProbs[j] = 0;
+        }
+      }
+      // end transition probabilities
+
+      // calculate prediction
+      // ___
+      // bel(Xt) = S p(Xt | Ut, Xt-1)bel(Xt-1)dXt-1
+      // with p(Xt | Ut, Xt-1) = transProbs[j]
+      double sum = 0;
+      for (int j = 0; j < NUM_STATES; j++)
+      {
+        sum += transProbs[j] * beliefStates[j];
+      }
+      newBeliefStates[i] = sum;
+      ROS_INFO("Belief for state [%d] = [%f]",i,sum);
+    } 
+
+    // update the Belief states with the new calculated values
+    for (int i = 0; i < NUM_STATES; i++)
+    {
+      beliefStates[i] = newBeliefStates[i];
+    } 
   };
   /*==========================================*/
 
