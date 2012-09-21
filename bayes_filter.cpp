@@ -47,30 +47,67 @@ public:
     for (int i = 0; i<NUM_STATES; i++) { 
 	beliefStates.push_back(0); 
     };
-    int worldArr[] = {
-      1,0,1, // 0
-      0,0,1, // 1
-      1,0,1, // 2
-      1,0,0, // 3
-      1,0,1, // 4
-      1,0,1, // 5
-      1,0,1, // 6
-      0,0,1, // 7
-      1,0,1, // 8
-      1,1,1, // 9
-      1,0,1, // 10
-      1,0,1, // 11
-      1,0,0, // 12
-      1,0,1, // 13
-      1,0,1, // 14
-      1,0,1, // 15
-      0,0,1, // 16
-      1,0,1, // 17
-      1,0,0, // 18
-      1,1,1  // 19
-    };
-    std::vector<int> test(worldArr, worldArr + sizeof(worldArr));
-
+    world[0][0] = 1;
+    world[0][1] = 0;
+    world[0][2] = 1;
+    world[0][0] = 0;
+    world[1][1] = 0;
+    world[1][2] = 1;
+    world[2][0] = 1;
+    world[2][1] = 0;
+    world[2][2] = 1;
+    world[3][0] = 1;
+    world[3][1] = 0;
+    world[3][2] = 0;
+    world[4][0] = 1;
+    world[4][1] = 0;
+    world[4][2] = 1;
+    world[5][0] = 1;
+    world[5][1] = 0;
+    world[5][2] = 1;
+    world[6][0] = 1;
+    world[6][1] = 0;
+    world[6][2] = 1;
+    world[7][0] = 0;
+    world[7][1] = 0;
+    world[7][2] = 1;
+    world[8][0] = 1;
+    world[8][1] = 0;
+    world[8][2] = 1;
+    world[9][0] = 1;
+    world[9][1] = 1;
+    world[9][2] = 1;
+    world[10][0] = 1;
+    world[10][1] = 0;
+    world[10][2] = 1;
+    world[11][0] = 1;
+    world[11][1] = 0;
+    world[11][2] = 1;
+    world[12][0] = 1;
+    world[12][1] = 0;
+    world[12][2] = 0;
+    world[13][0] = 1;
+    world[13][1] = 0;
+    world[13][2] = 1;
+    world[14][0] = 1;
+    world[14][1] = 0;
+    world[14][2] = 1;
+    world[15][0] = 1;
+    world[15][1] = 0;
+    world[15][2] = 1;
+    world[16][0] = 0;
+    world[16][1] = 0;
+    world[16][2] = 1;
+    world[17][0] = 1;
+    world[17][1] = 0;
+    world[17][2] = 1;
+    world[18][0] = 1;
+    world[18][1] = 0;
+    world[18][2] = 0;
+    world[19][0] = 1;
+    world[19][1] = 1;
+    world[19][2] = 1;
+    ROS_INFO("Bayes Filter running");
    /*============================================*/
    }; 
 
@@ -158,9 +195,23 @@ public:
     ROS_INFO("Wall left: [%d]", wall_left);
     ROS_INFO("Wall front: [%d]", wall_front);
     ROS_INFO("Wall right: [%d]", wall_right);
+    std::vector<int> possibleStates;
     for (int i = 0; i<NUM_STATES; i++) {
-    beliefStates[i]=1;
+      ROS_INFO("State %d [%d,%d,%d]",(i+1),world[i][0],world[i][1],world[i][2]);
+      int sensor_left  = (wall_left)?1:0;
+      int sensor_front = (wall_front)?1:0;
+      int sensor_right = (wall_right)?1:0;
+      if (
+            sensor_left == world[i][0]
+        &&  sensor_front == world[i][1]
+        &&  sensor_right == world[i][2]
+        ) {
+          possibleStates.push_back(i);
+          ROS_INFO("Possible state: [%d]",i);
+          beliefStates[i]=1;
+      }
   }
+
 
   };
   /*==========================================*/
@@ -289,7 +340,7 @@ protected:
   const static int UPPER_NOISE_THRESHOLD = 90;
   const static int LOWER_NOISE_THRESHOLD = 10;
   /*=TODO - INSERT-CHANGE CODE HERE IF NEEDED=*/
-  std::vector<int> world;
+  int world[20][3];
   /*==========================================*/
 };
 
