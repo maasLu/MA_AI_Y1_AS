@@ -45,7 +45,8 @@ public:
     /*=TODO - INSERT-CHANGE CODE HERE IF NEEDED=*/
     // Initial belief distribution
     for (int i = 0; i<NUM_STATES; i++) { 
-	beliefStates.push_back(1.0/NUM_STATES); 
+      beliefStates.push_back(1.0/NUM_STATES); 
+      predictions.push_back(0);
     };
     world[0][0] = 1;
     world[0][1] = 0;
@@ -201,7 +202,7 @@ public:
     // Ut from movement model
     // var [movenoise] bool for movement noise
 
-    double newBeliefStates[NUM_STATES];
+    double newPredictions[NUM_STATES];
     for (int i = 0; i < NUM_STATES; i++) 
     {
       // determine state transition probabilities 
@@ -264,14 +265,14 @@ public:
       {
         sum += transProbs[j] * beliefStates[j];
       }
-      newBeliefStates[i] = sum;
-      ROS_INFO("Belief for state [%d] = [%f]",i,sum);
+      newPredictions[i] = sum;
+      ROS_INFO("Prediction for state [%d] = [%f]",i,sum);
     } 
 
-    // update the Belief states with the new calculated values
+    // update the predictions with the new calculated values
     for (int i = 0; i < NUM_STATES; i++)
     {
-      beliefStates[i] = newBeliefStates[i];
+      predictions[i] = newPredictions[i];
     }     
   };
   /*==========================================*/
@@ -290,7 +291,7 @@ public:
     // Ut from turn model
     // var [movenoise] bool for movement noise
 
-    double newBeliefStates[NUM_STATES];
+    double newPredictions[NUM_STATES];
     for (int i = 0; i < NUM_STATES; i++) 
     {
       // determine state transition probabilities 
@@ -331,14 +332,14 @@ public:
       {
         sum += transProbs[j] * beliefStates[j];
       }
-      newBeliefStates[i] = sum;
-      ROS_INFO("Belief for state [%d] = [%f]",i,sum);
+      newPredictions[i] = sum;
+      ROS_INFO("Prediction for state [%d] = [%f]",i,sum);
     } 
 
-    // update the Belief states with the new calculated values
+    // update the predictions with the new calculated values
     for (int i = 0; i < NUM_STATES; i++)
     {
-      beliefStates[i] = newBeliefStates[i];
+      predictions[i] = newPredictions[i];
     } 
   };
   /*==========================================*/
@@ -356,12 +357,117 @@ public:
       int sensor_front = (wall_front)?1:0;
       int sensor_right = (wall_right)?1:0;
   */
-  void updateSensing() {
 
-        // example routine, generates random beliefs
-	for (int i = 0; i<NUM_STATES; i++) {
-		beliefStates[i]=(double)(rand()%100)/100;
-	}
+  
+  void updateSensing() {
+    // Measurement model
+    // p(Zt = sense_wall | Xt = is_wall ) = 0.8
+    // p(Zt = sense_door | Xt = is_wall ) = 0.2
+    // p(Zt = sense_wall | Xt = is_door ) = 0.3
+    // p(Zt = sense_door | Xt = is_door ) = 0.7
+
+    //                        ___
+    // bel(Xt) = n p(Zt | Xt) bel(Xt)
+    // var [measnoise] bool for measurement noise
+
+    // Read sensor data as integer
+    int sensor_left  = (wall_left)  ? 1 : 0;
+    int sensor_front = (wall_front) ? 1 : 0;
+    int sensor_right = (wall_right) ? 1 : 0;
+
+    ROS_INFO("Current observation:[L,F,R]=[%d,%d,%d]",sensor_left,sensor_front,sensor_right);
+
+    // determine observation probabilities 
+    // p(Zt | Xt)
+    double obsProbs[NUM_STATES];
+    double newBeliefStates[NUM_STATES];
+    for (int i = 0; i < NUM_STATES; i++) 
+    { 
+      // Expected observation for state i
+      int left  = world[i][0];
+      int front = world[i][1];
+      int right = world[i][2];
+      // Calculate probabilities separately for left, front right
+      double obsProb[3];
+      // with movement noise
+      if (measnoise) 
+      {
+        // left
+        if (left == 1) 
+        {
+          if (sensor_left == 1)
+            obsProb[0] = 0.8;
+          else
+            obsProb[0] = 0.2;
+        } 
+        else 
+        {
+          if (sensor_left == 1)
+            obsProb[0] = 0.3;
+          else
+            obsProb[0] = 0.7;
+        }
+        // front
+        if (front == 1) 
+        {
+          if (sensor_front == 1)
+            obsProb[1] = 0.8;
+          else
+            obsProb[1] = 0.2;
+        } 
+        else 
+        {
+          if (sensor_front == 1)
+            obsProb[1] = 0.3;
+          else
+            obsProb[1] = 0.7;
+        }
+        // right
+        if (right == 1) 
+        {
+          if (sensor_right == 1)
+            obsProb[2] = 0.8;
+          else
+            obsProb[2] = 0.2;
+        } 
+        else 
+        {
+          if (sensor_right == 1)
+            obsProb[2] = 0.3;
+          else
+            obsProb[2] = 0.7;
+        }
+        // p(Zt | Xt) = p(sense left | world state left) * ...
+        obsProbs[i] = obsProb[0] * obsProb[1] * obsProb[2];
+        ROS_INFO("obsProbs[i]=[%f]=[%f]*[%f]*[%f] for state [%d]=[%d,%d,%d]",
+          obsProbs[i],obsProb[0],obsProb[1],obsProb[2],i,world[i][0],world[i][1],world[i][2]);
+      }
+      // without movement noise
+      else 
+      {
+        obsProbs[i] = 1;
+      }
+      // end observation probabilities
+    } 
+    // calculate beliefstate
+    //                        ___
+    // bel(Xt) = n p(Zt | Xt) bel(Xt)
+    //                                   ___
+    // with p(Zt | Xt) = obsProbs[i] and bel(Xt) = predictions[i]
+    double n = 0;
+    for (int i = 0; i < NUM_STATES; i++)
+    {
+      n += obsProbs[i] * predictions[i];
+      ROS_INFO("Calculating n = obsProbs[i] * predictions[i]: [%f]=[%f]*[%f]",n,obsProbs[i],predictions[i]);
+    }
+    // normalizing factor
+    ROS_INFO("Calculated normalizing factor of: [%f]",n);
+    n = 1/n;
+    for (int i = 0; i < NUM_STATES; i++)
+    {
+      beliefStates[i] = n * obsProbs[i] * predictions[i];
+      ROS_INFO("Updated belief for state [%d] = [%f]",i,beliefStates[i]);
+    }
   }
   /*==========================================*/
 
@@ -468,6 +574,7 @@ protected:
   const static int LOWER_NOISE_THRESHOLD = 10;
   /*=TODO - INSERT-CHANGE CODE HERE IF NEEDED=*/
   int world[20][3];
+  std::vector<double> predictions;
   /*==========================================*/
 };
 
