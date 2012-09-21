@@ -18,6 +18,7 @@
 #include <cstdlib> // Needed for rand()
 #include <ctime> // Needed to seed random number generator with a time value
 #include <sstream>
+#include <vector>
 
 
 class BayesFilter {
@@ -46,34 +47,29 @@ public:
     for (int i = 0; i<NUM_STATES; i++) { 
 	beliefStates.push_back(0); 
     };
-        
-    world.resize(20);
-    for (int i = 0; i < world.size(); i++) {
-      world[i].resize(3);
-    }
-    world[0] = {1,0,1};
-    world[1] = {0,0,1};
-    world[2] = {1,0,1};
-    world[3] = {1,0,0};
-    world[4] = {1,0,1};
-    world[5] = {1,0,1};
-    world[6] = {1,0,1};
-    world[7] = {0,0,1};
-    world[8] = {1,0,1};
-    world[9] = {1,1,1};
-    world[10] = {1,0,1};
-    world[11] = {1,0,1};
-    world[12] = {1,0,0};
-    world[13] = {1,0,1};
-    world[14] = {1,0,1};
-    world[15] = {1,0,1};
-    world[16] = {0,0,1};
-    world[17] = {1,0,1};
-    world[18] = {1,0,0};
-    world[19] = {1,1,1};
-      
-
-
+    int worldArr[] = {
+      1,0,1, // 0
+      0,0,1, // 1
+      1,0,1, // 2
+      1,0,0, // 3
+      1,0,1, // 4
+      1,0,1, // 5
+      1,0,1, // 6
+      0,0,1, // 7
+      1,0,1, // 8
+      1,1,1, // 9
+      1,0,1, // 10
+      1,0,1, // 11
+      1,0,0, // 12
+      1,0,1, // 13
+      1,0,1, // 14
+      1,0,1, // 15
+      0,0,1, // 16
+      1,0,1, // 17
+      1,0,0, // 18
+      1,1,1  // 19
+    };
+    std::vector<int> test(worldArr, worldArr + sizeof(worldArr));
 
    /*============================================*/
    }; 
@@ -158,8 +154,13 @@ public:
 
   /*=TODO - INSERT-CHANGE CODE HERE IF NEEDED=*/
   void updateMove() {
-
-
+    ROS_INFO("=========================");
+    ROS_INFO("Wall left: [%d]", wall_left);
+    ROS_INFO("Wall front: [%d]", wall_front);
+    ROS_INFO("Wall right: [%d]", wall_right);
+    for (int i = 0; i<NUM_STATES; i++) {
+    beliefStates[i]=1;
+  }
 
   };
   /*==========================================*/
@@ -288,8 +289,7 @@ protected:
   const static int UPPER_NOISE_THRESHOLD = 90;
   const static int LOWER_NOISE_THRESHOLD = 10;
   /*=TODO - INSERT-CHANGE CODE HERE IF NEEDED=*/
-  vector <vector <int>> world;
-
+  std::vector<int> world;
   /*==========================================*/
 };
 
