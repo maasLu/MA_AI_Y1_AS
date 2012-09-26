@@ -48,66 +48,50 @@ public:
       beliefStates.push_back(1.0/NUM_STATES); 
       predictions.push_back(1.0/NUM_STATES);
     };
-    world[0][0] = 1;
-    world[0][1] = 0;
-    world[0][2] = 1;
-    world[1][0] = 0;
-    world[1][1] = 0;
-    world[1][2] = 1;
-    world[2][0] = 1;
-    world[2][1] = 0;
-    world[2][2] = 1;
-    world[3][0] = 1;
-    world[3][1] = 0;
-    world[3][2] = 0;
-    world[4][0] = 1;
-    world[4][1] = 0;
-    world[4][2] = 1;
-    world[5][0] = 1;
-    world[5][1] = 0;
-    world[5][2] = 1;
-    world[6][0] = 1;
-    world[6][1] = 0;
-    world[6][2] = 1;
-    world[7][0] = 0;
-    world[7][1] = 0;
-    world[7][2] = 1;
-    world[8][0] = 1;
-    world[8][1] = 0;
-    world[8][2] = 1;
-    world[9][0] = 1;
-    world[9][1] = 1;
-    world[9][2] = 1;
-    world[10][0] = 1;
-    world[10][1] = 0;
-    world[10][2] = 1;
-    world[11][0] = 1;
-    world[11][1] = 0;
-    world[11][2] = 1;
-    world[12][0] = 1;
-    world[12][1] = 0;
-    world[12][2] = 0;
-    world[13][0] = 1;
-    world[13][1] = 0;
-    world[13][2] = 1;
-    world[14][0] = 1;
-    world[14][1] = 0;
-    world[14][2] = 1;
-    world[15][0] = 1;
-    world[15][1] = 0;
-    world[15][2] = 1;
-    world[16][0] = 0;
-    world[16][1] = 0;
-    world[16][2] = 1;
-    world[17][0] = 1;
-    world[17][1] = 0;
-    world[17][2] = 1;
-    world[18][0] = 1;
-    world[18][1] = 0;
-    world[18][2] = 0;
-    world[19][0] = 1;
-    world[19][1] = 1;
-    world[19][2] = 1;
+    world[0][0] = 1;     world[0][1] = 0;     world[0][2] = 1;
+    world[1][0] = 0;     world[1][1] = 0;     world[1][2] = 1;
+    world[2][0] = 1;     world[2][1] = 0;     world[2][2] = 1;
+    world[3][0] = 1;     world[3][1] = 0;     world[3][2] = 0;
+    world[4][0] = 1;     world[4][1] = 0;     world[4][2] = 1;
+    world[5][0] = 1;     world[5][1] = 0;     world[5][2] = 1;
+    world[6][0] = 1;     world[6][1] = 0;     world[6][2] = 1;
+    world[7][0] = 0;     world[7][1] = 0;     world[7][2] = 1;
+    world[8][0] = 1;     world[8][1] = 0;     world[8][2] = 1;
+    world[9][0] = 1;     world[9][1] = 1;     world[9][2] = 1;
+
+    world[10][0] = 1;    world[10][1] = 0;    world[10][2] = 1;
+    world[11][0] = 1;    world[11][1] = 0;    world[11][2] = 1;
+    world[12][0] = 1;    world[12][1] = 0;    world[12][2] = 0;
+    world[13][0] = 1;    world[13][1] = 0;    world[13][2] = 1;
+    world[14][0] = 1;    world[14][1] = 0;    world[14][2] = 1;
+    world[15][0] = 1;    world[15][1] = 0;    world[15][2] = 1;
+    world[16][0] = 0;    world[16][1] = 0;    world[16][2] = 1;
+    world[17][0] = 1;    world[17][1] = 0;    world[17][2] = 1;
+    world[18][0] = 1;    world[18][1] = 0;    world[18][2] = 0;
+    world[19][0] = 1;    world[19][1] = 1;    world[19][2] = 1;
+
+    world[20][0] = 1;    world[20][1] = 1;    world[20][2] = 1;
+    world[21][0] = 1;    world[21][1] = 0;    world[21][2] = 0;
+    world[22][0] = 1;    world[22][1] = 0;    world[22][2] = 1;
+    world[23][0] = 0;    world[23][1] = 0;    world[23][2] = 1;
+    world[24][0] = 1;    world[24][1] = 0;    world[24][2] = 1;
+    world[25][0] = 1;    world[25][1] = 0;    world[25][2] = 1;
+    world[26][0] = 1;    world[26][1] = 0;    world[26][2] = 1;
+    world[27][0] = 1;    world[27][1] = 0;    world[27][2] = 0;
+    world[28][0] = 1;    world[28][1] = 0;    world[28][2] = 1;
+    world[29][0] = 1;    world[29][1] = 0;    world[29][2] = 1;
+
+    world[30][0] = 1;    world[30][1] = 1;    world[30][2] = 1;
+    world[31][0] = 1;    world[31][1] = 0;    world[31][2] = 1;
+    world[32][0] = 0;    world[32][1] = 0;    world[32][2] = 1;
+    world[33][0] = 1;    world[33][1] = 0;    world[33][2] = 1;
+    world[34][0] = 1;    world[34][1] = 0;    world[34][2] = 1;
+    world[35][0] = 1;    world[35][1] = 0;    world[35][2] = 1;
+    world[36][0] = 1;    world[36][1] = 0;    world[36][2] = 0;
+    world[37][0] = 1;    world[37][1] = 0;    world[37][2] = 1;
+    world[38][0] = 0;    world[38][1] = 0;    world[38][2] = 1;
+    world[39][0] = 1;    world[39][1] = 0;    world[39][2] = 1;
+
     ROS_INFO("Bayes Filter running");
    /*============================================*/
    }; 
@@ -211,19 +195,20 @@ public:
       // with movement noise
       if (movenoise) 
       {
-        for (int j = 0; j < NUM_STATES; j++)
+          for (int j = 0; j < NUM_STATES; j++)
         {
-          transProbs[i][j] = 0;
-          // P(Xi | Xi) = 0.1
-          if (j == i)
-            transProbs[i][j] = 0.1;
-          // P(Xi+1 | Xi) = 0.8
-          else if (j == (i+1))
-            transProbs[i][j] = 0.8;
-          // P(Xi+2 | Xi) = 0.1
-          else if (j == (i+2))
-            transProbs[i][j] = 0.1;
-
+          transProbs[i][j] = 0;    
+          if(i < NUM_STATES / 2 && j < NUM_STATES / 2) { // transition prob = 0 if states > 19 are involved (can only be reached by turning 90 degrees)
+            // P(Xi | Xi) = 0.1
+            if (j == i)
+                transProbs[i][j] = 0.1;
+            // P(Xi+1 | Xi) = 0.8
+            else if (j == (i+1))
+                transProbs[i][j] = 0.8;
+            // P(Xi+2 | Xi) = 0.1
+            else if (j == (i+2))
+                transProbs[i][j] = 0.1;
+            }
           // can't face other direction after a move
           if (
                 (i == 9   && j == 10)
@@ -318,12 +303,21 @@ public:
       for (int j = 0; j < NUM_STATES; j++)
       {
         transProbs[i][j] = 0;
-        // P(Xi | Xi) = 0.1
-        if (j == i)
-          transProbs[i][j] = 0.1;
-        // P(N-Xi-1 | Xi) = 0.9
-        else if (j == NUM_STATES - i - 1)
-          transProbs[i][j] = 0.9;
+        if(j < NUM_STATES / 2 && i < NUM_STATES / 2) {  // for states 0 - 19
+           // P(Xi | Xi) = 0.1
+           if (j == i)
+             transProbs[i][j] = 0.1;
+           // P((N/2)-Xi-1 | Xi) = 0.9
+           else if (j == (NUM_STATES / 2) - i - 1)
+             transProbs[i][j] = 0.9;
+        } else {                                        // for states 20 - 39
+            // P(Xi | Xi) = 0.1
+            if (j == i)
+              transProbs[i][j] = 0.1;
+            // P(N-Xi-1 | Xi) = 0.9
+            else if ((j - NUM_STATES / 2) == (NUM_STATES / 2) - (i - NUM_STATES / 2) - 1)
+              transProbs[i][j] = 0.9;
+        }
       }
       // end transition probabilities
     }
@@ -347,6 +341,58 @@ public:
     {
       predictions[i] = newPredictions[i];
     }     
+  }
+
+  void updateSmallTurn() {
+      // 90 degree turn model
+
+      double newPredictions[NUM_STATES];
+      double transProbs[NUM_STATES][NUM_STATES];
+      for (int i = 0; i < NUM_STATES; i++)
+      {
+        // determine state transition probabilities
+        // p(Xt | Ut, Xt-1)
+        for (int j = 0; j < NUM_STATES; j++)
+        {
+          transProbs[i][j] = 0;
+          if(i < NUM_STATES / 2) {       // transition from states 0 - 19
+             // P(Xi | Xi) = 0.1
+             if (j == i)
+               transProbs[i][j] = 0.1;
+             // P((N/2)-Xi-1 | Xi) = 0.9
+             else if (j == i + (NUM_STATES / 2))
+               transProbs[i][j] = 0.9;
+          } else {                         // transition from states 20 - 39
+              // P(Xi | Xi) = 0.1
+              if (j == i)
+                transProbs[i][j] = 0.1;
+              // P(N-Xi-1 | Xi) = 0.9
+              else if (i + j == NUM_STATES)
+                transProbs[i][j] = 0.9;
+          }
+        }
+        // end transition probabilities
+      }
+
+      // calculate prediction
+      // ___
+      // bel(Xt) = S p(Xt | Ut, Xt-1)bel(Xt-1)dXt-1
+      // with p(Xt | Ut, Xt-1) = transProbs[j]
+      for (int i = 0; i < NUM_STATES; i++)
+      {
+        double sum = 0;
+        for (int j = 0; j < NUM_STATES; j++)
+        {
+          sum += transProbs[j][i] * beliefStates[j];
+        }
+        newPredictions[i] = sum;
+        // ROS_INFO("Prediction for state [%d] = [%f], current belief=[%f]",i,sum,beliefStates[i]);
+      }
+      // update the predictions with the new calculated values
+      for (int i = 0; i < NUM_STATES; i++)
+      {
+        predictions[i] = newPredictions[i];
+      }
   }
   /*==========================================*/
 
@@ -509,7 +555,16 @@ public:
 	  if (measnoise==false) measnoise = true;
 	  else measnoise = false;
 	  ROS_INFO_STREAM("measurementnoise: " << measnoise);
-	}
+    }
+// Controller needs to send message '5' for 90 degree turns
+    if (msg->data == 5) {
+          for (int i = 0; i<std::min(steps,1); i++) {
+        rotateStartTime = ros::Time::now();
+        while (ros::Time::now() - rotateStartTime <= rotateDuration)
+        move(0,ROTATE_SPEED_RADPS/2);
+      }
+      updateSmallTurn();
+    }
 	publishBeliefMarkers();
   }
 
@@ -533,13 +588,13 @@ protected:
   ros::Duration moveDuration; // Duration of the rotation
   std::vector<double> beliefStates;
   bool wall_front, wall_left, wall_right, movenoise, measnoise, obstacle;
-  const static int NUM_STATES = 20;
+  const static int NUM_STATES = 40;
   const static double FORWARD_SPEED_MPS = 1.0;
   const static double ROTATE_SPEED_RADPS = M_PI/2;
   const static int UPPER_NOISE_THRESHOLD = 90;
   const static int LOWER_NOISE_THRESHOLD = 10;
   /*=TODO - INSERT-CHANGE CODE HERE IF NEEDED=*/
-  int world[20][3];
+  int world[NUM_STATES][3];
   std::vector<double> predictions;
   /*==========================================*/
 };
