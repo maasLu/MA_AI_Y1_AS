@@ -70,27 +70,27 @@ public:
     world[18][0] = 1;    world[18][1] = 0;    world[18][2] = 0;
     world[19][0] = 1;    world[19][1] = 1;    world[19][2] = 1;
 
-    world[20][0] = 1;    world[20][1] = 1;    world[20][2] = 1;
-    world[21][0] = 1;    world[21][1] = 0;    world[21][2] = 0;
-    world[22][0] = 1;    world[22][1] = 0;    world[22][2] = 1;
-    world[23][0] = 0;    world[23][1] = 0;    world[23][2] = 1;
-    world[24][0] = 1;    world[24][1] = 0;    world[24][2] = 1;
-    world[25][0] = 1;    world[25][1] = 0;    world[25][2] = 1;
-    world[26][0] = 1;    world[26][1] = 0;    world[26][2] = 1;
-    world[27][0] = 1;    world[27][1] = 0;    world[27][2] = 0;
-    world[28][0] = 1;    world[28][1] = 0;    world[28][2] = 1;
-    world[29][0] = 1;    world[29][1] = 0;    world[29][2] = 1;
+    world[20][0] = 0;    world[20][1] = 1;    world[20][2] = 1;
+    world[21][0] = 0;    world[21][1] = 1;    world[21][2] = 0;
+    world[22][0] = 0;    world[22][1] = 1;    world[22][2] = 0;
+    world[23][0] = 0;    world[23][1] = 0;    world[23][2] = 0;
+    world[24][0] = 0;    world[24][1] = 1;    world[24][2] = 0;
+    world[25][0] = 0;    world[25][1] = 1;    world[25][2] = 0;
+    world[26][0] = 0;    world[26][1] = 1;    world[26][2] = 0;
+    world[27][0] = 0;    world[27][1] = 1;    world[27][2] = 0;
+    world[28][0] = 0;    world[28][1] = 1;    world[28][2] = 0;
+    world[29][0] = 1;    world[29][1] = 1;    world[29][2] = 0;
 
-    world[30][0] = 1;    world[30][1] = 1;    world[30][2] = 1;
-    world[31][0] = 1;    world[31][1] = 0;    world[31][2] = 1;
-    world[32][0] = 0;    world[32][1] = 0;    world[32][2] = 1;
-    world[33][0] = 1;    world[33][1] = 0;    world[33][2] = 1;
-    world[34][0] = 1;    world[34][1] = 0;    world[34][2] = 1;
-    world[35][0] = 1;    world[35][1] = 0;    world[35][2] = 1;
-    world[36][0] = 1;    world[36][1] = 0;    world[36][2] = 0;
-    world[37][0] = 1;    world[37][1] = 0;    world[37][2] = 1;
-    world[38][0] = 0;    world[38][1] = 0;    world[38][2] = 1;
-    world[39][0] = 1;    world[39][1] = 0;    world[39][2] = 1;
+    world[30][0] = 0;    world[30][1] = 1;    world[30][2] = 1;
+    world[31][0] = 0;    world[31][1] = 1;    world[31][2] = 0;
+    world[32][0] = 0;    world[32][1] = 0;    world[32][2] = 0;
+    world[33][0] = 0;    world[33][1] = 1;    world[33][2] = 0;
+    world[34][0] = 0;    world[34][1] = 1;    world[34][2] = 0;
+    world[35][0] = 0;    world[35][1] = 1;    world[35][2] = 0;
+    world[36][0] = 0;    world[36][1] = 1;    world[36][2] = 0;
+    world[37][0] = 0;    world[37][1] = 1;    world[37][2] = 0;
+    world[38][0] = 0;    world[38][1] = 0;    world[38][2] = 0;
+    world[39][0] = 1;    world[39][1] = 1;    world[39][2] = 0;
 
     ROS_INFO("Bayes Filter running");
    /*============================================*/
