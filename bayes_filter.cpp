@@ -192,68 +192,51 @@ public:
     {
       // determine state transition probabilities 
       // p(Xt | Ut, Xt-1)
-      // with movement noise
-      if (movenoise) 
+      for (int j = 0; j < NUM_STATES; j++)
       {
-          for (int j = 0; j < NUM_STATES; j++)
+        transProbs[i][j] = 0;    
+        if(i < NUM_STATES / 2 && j < NUM_STATES / 2) // transition prob = 0 if states > 19 are involved (can only be reached by turning 90 degrees)
         {
-          transProbs[i][j] = 0;    
-          if(i < NUM_STATES / 2 && j < NUM_STATES / 2) { // transition prob = 0 if states > 19 are involved (can only be reached by turning 90 degrees)
-            // P(Xi | Xi) = 0.1
-            if (j == i)
-                transProbs[i][j] = 0.1;
-            // P(Xi+1 | Xi) = 0.8
-            else if (j == (i+1))
-                transProbs[i][j] = 0.8;
-            // P(Xi+2 | Xi) = 0.1
-            else if (j == (i+2))
-                transProbs[i][j] = 0.1;
-            }
-          // can't face other direction after a move
-          if (
-                (i == 9   && j == 10)
-            ||  (i == 9   && j == 11)
-            ||  (i == 19  && j == 0 )
-            ||  (i == 19  && j == 1 )
-            ||  (i == 8   && j == 10)
-            ||  (i == 18  && j == 0 ) 
-            )
-          {
-            transProbs[i][j] = 0;
-          }
+          // P(Xi | Xi) = 0.1
+          if (j == i)
+              transProbs[i][j] = 0.1;
+          // P(Xi+1 | Xi) = 0.8
+          else if (j == (i+1))
+              transProbs[i][j] = 0.8;
+          // P(Xi+2 | Xi) = 0.1
+          else if (j == (i+2))
+              transProbs[i][j] = 0.1;
         }
-        // normalize movement probabilities
-        // in state 9 for example, you can never reach another state according to the model
-        // so transprobs[9][9] = 1
-        double normalize = 0;
-        for (int j = 0; j < NUM_STATES; j++)
+        else if (i == j) // the model states that when the robot is in a 90* turned position it is unable to move, only turn
         {
-          normalize += transProbs[i][j];
+          transProbs[i][j] = 1;
         }
-        // ROS_INFO("For state %d, normalize = %f",i,normalize);
-        for (int j = 0; j < NUM_STATES; j++)
+        // can't face other direction after a move
+        if (
+              (i == 9   && j == 10)
+          ||  (i == 9   && j == 11)
+          ||  (i == 19  && j == 0 )
+          ||  (i == 19  && j == 1 )
+          ||  (i == 8   && j == 10)
+          ||  (i == 18  && j == 0 ) 
+          )
         {
-          transProbs[i][j] = transProbs[i][j] / normalize;
+          transProbs[i][j] = 0;
         }
       }
-      // without movement noise
-      else 
+      // normalize movement probabilities
+      // in state 9 for example, you can never reach another state according to the model
+      // so transprobs[9][9] = 1
+      double normalize = 0;
+      for (int j = 0; j < NUM_STATES; j++)
       {
-        for (int j = 0; j < NUM_STATES; j++)
-        {
-          if (j == i + 1)
-            transProbs[i][j] = 1;
-          else
-            transProbs[i][j] = 0;
-
-          if (
-                (i == 9   && j == 10)
-            ||  (i == 19  && j == 0 )
-            )
-          {
-            transProbs[i][j] = 0;
-          }
-        }
+        normalize += transProbs[i][j];
+      }
+      // ROS_INFO("For state %d, normalize = %f",i,normalize);
+      for (int j = 0; j < NUM_STATES; j++)
+      {
+        if (normalize > 0)
+          transProbs[i][j] = transProbs[i][j] / normalize;
       }
       // end transition probabilities
     }
@@ -425,7 +408,7 @@ public:
     // the sensor observations
     int sensorObs[3] = {(wall_left) ? 1 : 0, (wall_front) ? 1 : 0, (wall_right) ? 1 : 0};
 
-    ROS_INFO("Current observation:[L,F,R]=[%d,%d,%d]",sensorObs[0],sensorObs[1],sensorObs[2]);
+    // ROS_INFO("Current observation:[L,F,R]=[%d,%d,%d]",sensorObs[0],sensorObs[1],sensorObs[2]);
 
     // determine observation probabilities 
     // p(Zt | Xt)
@@ -478,7 +461,7 @@ public:
     for (int i = 0; i < NUM_STATES; i++)
     {
       beliefStates[i] = n * obsProbs[i] * predictions[i];
-       // ROS_INFO("Updated belief for state [%d] = [%f]",i,beliefStates[i]);
+      ROS_INFO("Updated belief for state [%d] = [%f]",i,beliefStates[i]);
     }
   }
   /*==========================================*/
