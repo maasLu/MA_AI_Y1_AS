@@ -211,7 +211,30 @@ public:
 	oss2 << beliefStates[i];	
 	marker2.text = oss.str();// + "\nBelief:\n" + oss2.str();
 	marker2.id = NUM_STATES + i;
-	beliefs.markers.push_back(marker2);    
+	beliefs.markers.push_back(marker2);
+
+  // Display beliefs in a table
+  marker2.header.frame_id = "/map";
+  marker2.header.stamp = ros::Time();
+  marker2.ns = "beliefstable";
+  marker2.type = visualization_msgs::Marker::TEXT_VIEW_FACING;
+  marker2.action = visualization_msgs::Marker::ADD;
+  marker2.text = oss.str() + ": " + oss2.str();
+  marker2.pose.position.x = 2 - (i % 5) / 4.0;
+  marker2.pose.position.y = 3.5-(i / 5);
+  marker2.color.r = 1.0f;
+  marker2.color.g = 1.0f;
+  marker2.color.b = 1.0f;
+  marker2.color.a = 1.0;
+  marker2.pose.orientation.x = 0.0;
+  marker2.pose.orientation.y = 0.0;
+  marker2.pose.orientation.z = 0.0;
+  marker2.pose.orientation.w = 1.0;
+  marker2.scale.x = 0.5;
+  marker2.scale.y = 1.0;
+  marker2.scale.z = 0.15;
+  beliefs.markers.push_back(marker2);
+
      }
      markerPub.publish(beliefs);
   };
