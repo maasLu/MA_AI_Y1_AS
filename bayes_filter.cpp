@@ -108,27 +108,60 @@ public:
 	marker.ns = "beliefs";
 	marker.type = visualization_msgs::Marker::CUBE;
 	marker.action = visualization_msgs::Marker::ADD;
-	if (i >= 10) {	
-		marker.pose.position.x = -0.8;
-    		marker.pose.position.y =  4.5 -i%10;
+  // Changed by Lukas and Rik
+  marker.pose.position.z = 0.2;
+  marker.pose.orientation.x = 0.0;
+  marker.pose.orientation.y = 0.0;
+  marker.pose.orientation.z = 0.0;
+  marker.pose.orientation.w = 1.0;
+  marker.scale.x = 0.2;
+  marker.scale.y = 1.0;
+  marker.scale.z = 1.0;
+  // Set the color -- be sure to set alpha to something non-zero!
+  marker.color.r = 1.0f;
+  marker.color.g = 0.0f;
+  marker.color.b = 0.0f;
+  marker.color.a = 1.0  * beliefStates[i]   ;
+	if (i >= 10 && i < 20) {	
+		marker.pose.position.x = -0.4;
+    marker.pose.position.y =  4.5 -i%10;
+    marker.color.r = 0.0f;
+    marker.color.g = 1.0f;
+    marker.color.b = 1.0f;
+    marker.scale.y = 0.4;
+    marker.scale.z = 0.2;
 	}	
+  else if (i >= 20 && i < 30)
+  {
+    marker.pose.position.x = 0;
+    marker.pose.position.y = -4.9 + (i-20);
+    marker.pose.orientation.y = 1.0;
+    marker.scale.y = 0.2;
+    marker.scale.z = 0.4;
+    marker.color.r = 0.0f;
+    marker.color.g = 0.0f;
+    marker.color.b = 1.0f;
+  }
+  else if (i >= 30)
+  {
+    marker.pose.position.x = 0;
+    marker.pose.position.y = 4.9 - (i-20)%10;
+    marker.pose.orientation.y = 1.0;
+    marker.scale.y = 0.2;
+    marker.scale.z = 0.4;
+    marker.color.r = 0.0f;
+    marker.color.g = 1.0f;
+    marker.color.b = 0.0f;
+  }
 	else{
-		marker.pose.position.x = 0.8;
-    		marker.pose.position.y = -4.5 +i;
+		marker.pose.position.x = 0.4;
+		marker.pose.position.y = -4.5 +i;
+    marker.scale.y = 0.4;
+    marker.scale.z = 0.2;
 	}
-    	marker.pose.position.z = 0.2;
-    	marker.pose.orientation.x = 0.0;
-    	marker.pose.orientation.y = 0.0;
-    	marker.pose.orientation.z = 0.0;
-   	marker.pose.orientation.w = 1.0;
-	marker.scale.x = 0.5;
-  	marker.scale.y = 1.0;
-  	marker.scale.z = 1.0;
-    	// Set the color -- be sure to set alpha to something non-zero!
-    	marker.color.r = 1.0f;
-    	marker.color.g = 0.0f;
-    	marker.color.b = 0.0f;
-    	marker.color.a = 1.0  * beliefStates[i]		;
+    	
+	
+    	
 	marker.id = i;
 	beliefs.markers.push_back(marker); 
 
@@ -139,14 +172,29 @@ public:
 	marker2.ns = "beliefs";
 	marker2.type = visualization_msgs::Marker::TEXT_VIEW_FACING;
 	marker2.action = visualization_msgs::Marker::ADD;
-	if (i >= 10) {	
-		marker2.pose.position.x = -0.8;
-    		marker2.pose.position.y =  4.5 -i%10;
+  
+  marker2.color.r = 1.0f;
+  marker2.color.g = 1.0f;
+  marker2.color.b = 1.0f;
+  marker2.color.a = 1.0;
+	if (i >= 10 && i < 20) {	
+		marker2.pose.position.x = -0.4;
+    marker2.pose.position.y =  4.5 -i%10;
 	}	
+  else if (i >= 20 && i < 30) {  
+    marker2.pose.position.x = 0;
+    marker2.pose.position.y =  -4.9 +(i-20);
+  } 
+  else if (i >= 30) {  
+    marker2.pose.position.x = 0;
+    marker2.pose.position.y =  4.9 - (i-20)%10;
+  } 
 	else{
-		marker2.pose.position.x = 0.8;
-    		marker2.pose.position.y = -4.5 +i;
+		marker2.pose.position.x = 0.4;
+    marker2.pose.position.y = -4.5 +i;
 	}
+  // Set the color -- be sure to set alpha to something non-zero!
+  marker2.color.a = 1.0;
     	marker2.pose.position.z = 0.2;
     	marker2.pose.orientation.x = 0.0;
     	marker2.pose.orientation.y = 0.0;
@@ -155,17 +203,13 @@ public:
 	marker2.scale.x = 0.5;
   	marker2.scale.y = 1.0;
   	marker2.scale.z = 0.15;
-    	// Set the color -- be sure to set alpha to something non-zero!
-    	marker2.color.r = 1.0f;
-    	marker2.color.g = 1.0f;
-    	marker2.color.b = 1.0f;
-    	marker2.color.a = 1.0;
+    	
 	//std::string text = boost::lexical_cast<string>(i);
 	std::ostringstream oss;
 	oss << i;	
 	std::ostringstream oss2;
 	oss2 << beliefStates[i];	
-	marker2.text = "State: " + oss.str() + "\nBelief:\n" + oss2.str();
+	marker2.text = oss.str();// + "\nBelief:\n" + oss2.str();
 	marker2.id = NUM_STATES + i;
 	beliefs.markers.push_back(marker2);    
      }
@@ -573,7 +617,7 @@ public:
 	if (msg->data == 1) {
     	  for (int i = 0; i<std::min(steps,1); i++) {
 	    rotateStartTime = ros::Time::now();
- 	    while (ros::Time::now() - rotateStartTime <= rotateDuration) 
+ 	    while (ros::Time::now() - rotateStartTime <= ros::Duration(1.8f)) 
   		move(0,ROTATE_SPEED_RADPS);
 	  }
 	  updateTurn();
