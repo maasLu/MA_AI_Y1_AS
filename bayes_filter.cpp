@@ -326,7 +326,7 @@ public:
     }     
   }
 
-  void updateSmallTurn() {
+  void updateSmallTurnLeft() {
       // 90 degree turn model
 
       double newPredictions[NUM_STATES];
@@ -343,14 +343,66 @@ public:
              if (j == i)
                transProbs[i][j] = 0.1;
              // P((N/2)-Xi-1 | Xi) = 0.9
-             else if (j == i + (NUM_STATES / 2))
+             else if (j == NUM_STATES - i -1) // @Lukas, from states 0-19 you go to states 39-20
                transProbs[i][j] = 0.9;
           } else {                         // transition from states 20 - 39
               // P(Xi | Xi) = 0.1
               if (j == i)
                 transProbs[i][j] = 0.1;
               // P(N-Xi-1 | Xi) = 0.9
-              else if (i + j == NUM_STATES)
+              else if (j == i - (NUM_STATES/2)) // @Lukas, from states 20-39 you go to states 0-19
+                transProbs[i][j] = 0.9;
+          }
+        }
+        // end transition probabilities
+      }
+
+      // calculate prediction
+      // ___
+      // bel(Xt) = S p(Xt | Ut, Xt-1)bel(Xt-1)dXt-1
+      // with p(Xt | Ut, Xt-1) = transProbs[j]
+      for (int i = 0; i < NUM_STATES; i++)
+      {
+        double sum = 0;
+        for (int j = 0; j < NUM_STATES; j++)
+        {
+          sum += transProbs[j][i] * beliefStates[j];
+        }
+        newPredictions[i] = sum;
+        // ROS_INFO("Prediction for state [%d] = [%f], current belief=[%f]",i,sum,beliefStates[i]);
+      }
+      // update the predictions with the new calculated values
+      for (int i = 0; i < NUM_STATES; i++)
+      {
+        predictions[i] = newPredictions[i];
+      }
+  }
+
+  void updateSmallTurnRight() {
+      // 90 degree turn model
+
+      double newPredictions[NUM_STATES];
+      double transProbs[NUM_STATES][NUM_STATES];
+      for (int i = 0; i < NUM_STATES; i++)
+      {
+        // determine state transition probabilities
+        // p(Xt | Ut, Xt-1)
+        for (int j = 0; j < NUM_STATES; j++)
+        {
+          transProbs[i][j] = 0;
+          if(i < NUM_STATES / 2) {       // transition from states 0 - 19
+             // P(Xi | Xi) = 0.1
+             if (j == i)
+               transProbs[i][j] = 0.1;
+             // P((N/2)-Xi-1 | Xi) = 0.9
+             else if (j == i + (NUM_STATES / 2)) // from states 0-19 you go to states 20-39
+               transProbs[i][j] = 0.9;
+          } else {                         // transition from states 20 - 39
+              // P(Xi | Xi) = 0.1
+              if (j == i)
+                transProbs[i][j] = 0.1;
+              // P(N-Xi-1 | Xi) = 0.9
+              else if (j == NUM_STATES - i -1) // from states 20-30 you go to states 19-0
                 transProbs[i][j] = 0.9;
           }
         }
@@ -461,7 +513,7 @@ public:
     for (int i = 0; i < NUM_STATES; i++)
     {
       beliefStates[i] = n * obsProbs[i] * predictions[i];
-      ROS_INFO("Updated belief for state [%d] = [%f]",i,beliefStates[i]);
+      ROS_INFO("Belief state [%d] = [%f]",i,beliefStates[i]);
     }
   }
   /*==========================================*/
@@ -539,14 +591,24 @@ public:
 	  else measnoise = false;
 	  ROS_INFO_STREAM("measurementnoise: " << measnoise);
     }
-// Controller needs to send message '5' for 90 degree turns
+// Controller needs to send message '5' for 90 degree turns to the left
     if (msg->data == 5) {
           for (int i = 0; i<std::min(steps,1); i++) {
         rotateStartTime = ros::Time::now();
         while (ros::Time::now() - rotateStartTime <= rotateDuration)
         move(0,ROTATE_SPEED_RADPS/2);
       }
-      updateSmallTurn();
+      updateSmallTurnLeft();
+    }
+// Controller needs to send message '6' for 90 degree turns to the right
+    if (msg->data == 6) {
+          for (int i = 0; i<std::min(steps,1); i++) {
+        rotateStartTime = ros::Time::now();
+        while (ros::Time::now() - rotateStartTime <= ros::Duration(2.7f))
+        move(0,ROTATE_SPEED_RADPS);
+    
+      }
+      updateSmallTurnRight();
     }
 	publishBeliefMarkers();
   }
