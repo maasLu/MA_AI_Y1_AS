@@ -13,7 +13,6 @@
   */
   void MyLocaliser::initialisePF( const geometry_msgs::PoseWithCovarianceStamped& initialpose )
   {
-    ROS_INFO("width: %i , height: %i, resolution: %i", map.info.width, map.info.height, map.info.resolution);
     for (unsigned int i = 0; i < particleCloud.poses.size(); ++i)
     {
       particleCloud.poses[i].position.x = map.info.width * map.info.resolution * ((float)rand()/(float)RAND_MAX);
@@ -86,7 +85,17 @@
     }
   }
 
-  
+
+  std::vector <double> weights;
+  double normalize;
+  void normalizeWeights() {
+      for(unsigned int i = 0 ; i < weights.size() ; i++) {
+          normalize += weights[i];
+      }
+      for(unsigned int i = 0 ; i < weights.size() ; i++) {
+          weights[i] /= normalize;
+      }
+  }
   /**
    * This is where resampling should go, after applying the motion and
    * sensor models.
@@ -96,8 +105,35 @@
     const nav_msgs::OccupancyGrid& map,
     const geometry_msgs::PoseArray& particleCloud )
   {
-    return this->particleCloud;
+        int size = particleCloud.poses.size();
+        geometry_msgs::PoseArray resampled;
+        normalizeWeights();
+        double remain = 0;
+        int index = 0;
+        /*
+        Stochastic Universal Sampling
+        */
+        for(int i = 0 ; i < size ; i++) {
+            double part = normalize/size;
+            if(weights[i] >= part+remain) {
+                geometry_msgs::Pose pose;
+                pose.position = particleCloud.poses[i].position;
+                pose.orientation = particleCloud.poses[i].orientation;
+                resampled.poses[index] = pose;
+                index++;
+                weights[i]-=part;
+                remain = 0;
+                i--;
+            } else {
+                remain = weights[i];
+
+            }
+        }
+
+    return resampled;
   }
+
+
 
 
 
