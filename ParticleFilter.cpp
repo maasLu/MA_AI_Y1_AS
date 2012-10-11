@@ -1,5 +1,4 @@
 #include "ParticleFilter.hpp"
-
 // Used for simulateRangeScan
 #include "occupancy_grid_utils/ray_tracer.h"
 #include <iostream>
@@ -14,14 +13,16 @@
   */
   void MyLocaliser::initialisePF( const geometry_msgs::PoseWithCovarianceStamped& initialpose )
   {
+    ROS_INFO("width: %i , height: %i, resolution: %i", map.info.width, map.info.height, map.info.resolution);
     for (unsigned int i = 0; i < particleCloud.poses.size(); ++i)
     {
-      particleCloud.poses[i].position.x = 10 * ((float)rand()/(float)RAND_MAX);
-      particleCloud.poses[i].position.y = 17 * ((float)rand()/(float)RAND_MAX);
+      particleCloud.poses[i].position.x = map.info.width * map.info.resolution * ((float)rand()/(float)RAND_MAX);
+      particleCloud.poses[i].position.y = map.info.height * map.info.resolution * ((float)rand()/(float)RAND_MAX);
       geometry_msgs::Quaternion odom_quat =
         tf::createQuaternionMsgFromYaw(i*0.01);
       particleCloud.poses[i].orientation = odom_quat;
     }
+
   }
   
 
