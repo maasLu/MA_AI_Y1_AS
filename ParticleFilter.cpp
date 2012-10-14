@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <math.h>
 #include <cstdlib>
+#include "vector"
+
 
 
  /**  
@@ -72,9 +74,105 @@
       //particleCloud.poses[i].position.y += deltaY;
         particleCloud.poses[i].position.x = xPrime;
         particleCloud.poses[i].position.y = yPrime;
-        particleCloud.poses[i].orienation.w = tPrime;
+        particleCloud.poses[i].orientation.w = tPrime;
+	}
+}
+
+  // Rik
+  
+
+  double MyLocaliser::beamRangeFinderModel(
+      const sensor_msgs::LaserScan& scan, 
+      const sensor_msgs::LaserScan::Ptr& simulatedScan, 
+      geometry_msgs::Pose sensor_pose,
+      std::vector<double> probs)
+  {
+    // q = 1
+    double q = 1.0; // rik
+    // for k = 1 to K do
+    for (unsigned int k = 0; k < simulatedScan->ranges.size(); k++)
+    {
+      // compute zkt* for the measurement zkt using ray casting
+      // actual measurement
+      float zkt       = scan.ranges[k];
+      // true measurement from robots pose
+      float zkt_star  = simulatedScan->ranges[k];
+      // p = zHit * pHit(zkt|xt,m) + zShort * pShort(zkt|xt,m) + zMax * pMax(zkt|xt,m) + zRand * pRand(zkt|xt,m)
+      double zHit   = probs[0];
+      double zShort = probs[1];
+      double zMax   = probs[2];
+      double zRand  = probs[3];
+      double sHit   = probs[4];
+      double lShort = probs[5];
+
+      double p =   
+            zHit    * calculate_pHit(zkt, zkt_star, sHit)
+          + zShort  * calculate_pShort(zkt, zkt_star, lShort)
+          + zMax    * calculate_pMax(zkt, zMax)
+          + zRand   * calculate_pRand(zkt, zMax);
+      // q = q * p;
+      q = q * p;
     }
+    // return q
+    return q;
   }
+
+  double MyLocaliser::calculate_pHit(float zkt, float zkt_star, double sHit)
+  {
+    return (1/(sqrt(2 * M_PI * pow(sHit,2)))) * exp(-0.5*((pow((zkt-zkt_star),2))/pow(sHit,2)));
+  }
+
+  double MyLocaliser::calculate_pShort(float zkt, float zkt_star, double lShort)
+  {
+    if (zkt >= 0 && zkt <= zkt_star)
+    {
+      return (1 / (1 - (exp(-lShort * zkt_star)))) * lShort * exp(-lShort * zkt);
+    }
+    return 0;
+  }
+
+  double MyLocaliser::calculate_pMax(float zkt, double zMax)
+  {
+    if (zkt == zMax)
+    {
+      return 1;
+    }
+    return 0;
+  }
+
+  double MyLocaliser::calculate_pRand(float zkt, double zMax)
+  {
+    if (zkt >= 0 && zkt < zMax)
+    {
+      return (1.0 / zMax);
+    }
+    return 0;
+  }
+
+  std::vector<double> MyLocaliser::learnIntrinsicParameters()
+  {
+    std::vector<double> probs;
+    double zHit   = 0.1;
+    double zShort = 0.1;
+    double zMax   = 0.1;
+    double zRand  = 0.1;
+    double sHit   = 0.1;
+    double lShort = 0.1;
+
+    // TODO
+
+
+
+    probs.push_back(zHit);
+    probs.push_back(zShort);
+    probs.push_back(zMax);
+    probs.push_back(zRand);
+    probs.push_back(sHit);
+    probs.push_back(lShort);
+
+    return probs;
+  }
+  // End Rik
 
 
   /**
@@ -87,13 +185,19 @@
   {
     /* This method is the beginning of an implementation of a beam
      * sensor model */  
+    
+    std::vector<double> probs; // rik
+    probs = learnIntrinsicParameters(); // rik
     for (unsigned int i = 0; i < particleCloud.poses.size(); ++i)
     {
+      weights.push_back(1.0 / particleCloud.poses.size());
       geometry_msgs::Pose sensor_pose;      
-      sensor_pose =  particleCloud.poses[i];
+      sensor_pose = particleCloud.poses[i];
       /* If the laser and centre of the robot weren't at the same
        * position, we would first apply the tf from /base_footprint
        * to /base_laser here. */
+
+      // compute Zkt* for the measurement zkt using ray casting - rik
       sensor_msgs::LaserScan::Ptr simulatedScan;
       try{
         simulatedScan
@@ -104,6 +208,11 @@
       {
         continue;
       }
+
+      // Rik
+      double q = beamRangeFinderModel(scan, simulatedScan, sensor_pose, probs);
+
+      // End Rik
 
       /* Now we have the actual scan, and a simulated version ---
        * i.e., how a scan would look if the robot were at the pose
@@ -146,7 +255,7 @@
         normalizeWeights();
         double remain = 0;
         int index = 0;
-        /*
+        
         Stochastic Universal Sampling
 
         for(int i = 0 ; i < size ; i++) {
@@ -169,11 +278,8 @@
         }
 */
     //return resampled;
-    return this<-particleCloud;
+    return this->particleCloud;
   }
-
-
-
 
 
   /**
