@@ -2,6 +2,9 @@
 // Used for simulateRangeScan
 #include "occupancy_grid_utils/ray_tracer.h"
 #include <iostream>
+#include <stdio.h>
+#include <math.h>
+#include <cstdlib>
 
 
  /**  
@@ -13,6 +16,7 @@
   */
   void MyLocaliser::initialisePF( const geometry_msgs::PoseWithCovarianceStamped& initialpose )
   {
+      ROS_INFO("A");
     for (unsigned int i = 0; i < particleCloud.poses.size(); ++i)
     {
       particleCloud.poses[i].position.x = map.info.width * map.info.resolution * ((float)rand()/(float)RAND_MAX);
@@ -24,7 +28,17 @@
 
   }
   
-
+  double sample(double b) {
+    b = sqrt(b);
+    double s = 0;
+    for(int i = 0 ; i < 12 ; i++) {
+        float random = ((float) rand()) / (float) RAND_MAX;
+        float diff = 2 * b;
+        float r = random * diff;
+        s+=-b + r;
+    }
+    return s/2;
+  }
 
   /**
    * Your implementation of this should sample from a random
@@ -37,8 +51,28 @@
       ROS_DEBUG( "applying odometry: %f %f %f", deltaX, deltaY, deltaT );
     for (unsigned int i = 0; i < particleCloud.poses.size(); ++i)
     {
-      particleCloud.poses[i].position.x += deltaX;
-      particleCloud.poses[i].position.y += deltaY;      
+        double a1, a2, a3, a4 = 0.1;
+        double x = particleCloud.poses[i].position.x;
+        double y = particleCloud.poses[i].position.y;
+        double t = particleCloud.poses[i].orientation.w;
+        double xPrime = x + deltaX;
+        double yPrime = y + deltaY;
+        double tPrime = t + deltaT;
+        double deltarot1 = atan2 ((yPrime-y),(xPrime - x));
+        double deltatrans = sqrt (((x - xPrime) * (x - xPrime))+((y-yPrime)*(y-yPrime)));
+        double deltarot2 = tPrime - t - deltarot1;
+        double deltahatrot1 = deltarot1 - sample(a1 * pow(deltarot1, 2) + a2 * pow(deltatrans, 2));
+        double deltahattrans = deltatrans - sample(a3 * pow(deltarot2, 2) + a4 * pow(deltarot1, 2) + a4 * pow(deltarot2, 2));
+        double deltahatrot2 = deltarot2 - sample(a1 * pow(deltarot2, 2) + a2 * pow(deltatrans, 2));
+        xPrime = x + deltahattrans * cos(t + deltahatrot1);
+        yPrime = y + deltahattrans * sin(t + deltahatrot1);
+        tPrime = t + deltahatrot1 + deltahatrot2;
+
+      //particleCloud.poses[i].position.x += deltaX;
+      //particleCloud.poses[i].position.y += deltaY;
+        particleCloud.poses[i].position.x = xPrime;
+        particleCloud.poses[i].position.y = yPrime;
+        particleCloud.poses[i].orienation.w = tPrime;
     }
   }
 
@@ -84,7 +118,7 @@
       //   }
     }
   }
-
+/*
 
   std::vector <double> weights;
   double normalize;
@@ -95,7 +129,7 @@
       for(unsigned int i = 0 ; i < weights.size() ; i++) {
           weights[i] /= normalize;
       }
-  }
+  }*/
   /**
    * This is where resampling should go, after applying the motion and
    * sensor models.
@@ -105,14 +139,16 @@
     const nav_msgs::OccupancyGrid& map,
     const geometry_msgs::PoseArray& particleCloud )
   {
-        int size = particleCloud.poses.size();
+      ROS_INFO("A");
+      /*
+      int size = particleCloud.poses.size();
         geometry_msgs::PoseArray resampled;
         normalizeWeights();
         double remain = 0;
         int index = 0;
         /*
         Stochastic Universal Sampling
-        */
+
         for(int i = 0 ; i < size ; i++) {
             double part = normalize/size;
             if(weights[i] >= part+remain) {
@@ -120,7 +156,9 @@
                 pose.position = particleCloud.poses[i].position;
                 pose.orientation = particleCloud.poses[i].orientation;
                 resampled.poses[index] = pose;
-                index++;
+                if(index < size) {
+                    index++;
+                }
                 weights[i]-=part;
                 remain = 0;
                 i--;
@@ -129,8 +167,9 @@
 
             }
         }
-
-    return resampled;
+*/
+    //return resampled;
+    return this<-particleCloud;
   }
 
 
