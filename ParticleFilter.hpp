@@ -54,8 +54,7 @@ protected:
    */
   virtual geometry_msgs::PoseWithCovariance updatePose();
 
-  std::vector <double> weights;
-  double normalize;
+  
 
   // Added by Rik
   double beamRangeFinderModel(
@@ -68,6 +67,11 @@ protected:
   double calculate_pMax(float zkt, double zMax);
   double calculate_pRand(float zkt, double zMax);
   std::vector<double> learnIntrinsicParameters();
+  void normalizeWeights();
+
+private:
+  std::vector <double> weights;
+  double normalize;
 };
 
 #endif

@@ -18,7 +18,7 @@
   */
   void MyLocaliser::initialisePF( const geometry_msgs::PoseWithCovarianceStamped& initialpose )
   {
-      ROS_INFO("A");
+      ROS_INFO("ParticleCloud has size [%d]",particleCloud.poses.size());
     for (unsigned int i = 0; i < particleCloud.poses.size(); ++i)
     {
       particleCloud.poses[i].position.x = map.info.width * map.info.resolution * ((float)rand()/(float)RAND_MAX);
@@ -28,6 +28,7 @@
       particleCloud.poses[i].orientation = odom_quat;
       weights.push_back(1 / particleCloud.poses.size());
     }
+    ROS_INFO("Weights got init to size [%d]",weights.size());
 
   }
   
@@ -50,6 +51,7 @@
    */
   void MyLocaliser::applyMotionModel( double deltaX, double deltaY, double deltaT )
   {
+    ROS_INFO("Start motion model");
     if (deltaX > 0 or deltaY > 0)
       ROS_DEBUG( "applying odometry: %f %f %f", deltaX, deltaY, deltaT );
     for (unsigned int i = 0; i < particleCloud.poses.size(); ++i)
@@ -77,6 +79,7 @@
         particleCloud.poses[i].position.y = yPrime;
         particleCloud.poses[i].orientation.w = tPrime;
 	}
+  ROS_INFO("End motion model");
 }
 
   // Rik
@@ -184,6 +187,7 @@
    */
   void MyLocaliser::applySensorModel( const sensor_msgs::LaserScan& scan )
   {
+    ROS_INFO("Start sensor model");
     /* This method is the beginning of an implementation of a beam
      * sensor model */  
     
@@ -191,7 +195,6 @@
     probs = learnIntrinsicParameters(); // rik
     for (unsigned int i = 0; i < particleCloud.poses.size(); ++i)
     {
-      weights.push_back(1.0 / particleCloud.poses.size());
       geometry_msgs::Pose sensor_pose;      
       sensor_pose = particleCloud.poses[i];
       /* If the laser and centre of the robot weren't at the same
@@ -227,18 +230,20 @@
       //     std::cerr << "\n\n";
       //   }
     }
+    ROS_INFO("End sensor model");
   }
 
 
-  std::vector <double> weights;
-  double normalize;
-  void normalizeWeights() {
+  
+  void MyLocaliser::normalizeWeights() {
     ROS_INFO("B");
+    ROS_INFO("Weights has size [%d]",weights.size());
       for(unsigned int i = 0 ; i < weights.size() ; i++) {
           normalize += weights[i];
       }
       for(unsigned int i = 0 ; i < weights.size() ; i++) {
           weights[i] /= normalize;
+          ROS_INFO("Weight %d = %f",i,weights[i]);
       }
       ROS_INFO("C");
   }
@@ -262,7 +267,9 @@
         // Stochastic Universal Sampling
 
         for(int i = 0 ; i < size ; i++) {
+          
             double part = normalize/size;
+            //ROS_INFO("i: [%d] part: [%f], n: [%f]",i,part,normalize);
             if(weights[i] >= part+remain) {
                 geometry_msgs::Pose pose;
                 pose.position = particleCloud.poses[i].position;
@@ -279,7 +286,7 @@
 
             }
         }
-
+        ROS_INFO("D");
     return resampled;
     //return this->particleCloud;
   }
