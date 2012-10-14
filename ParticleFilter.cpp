@@ -26,6 +26,7 @@
       geometry_msgs::Quaternion odom_quat =
         tf::createQuaternionMsgFromYaw(i*0.01);
       particleCloud.poses[i].orientation = odom_quat;
+      weights.push_back(1 / particleCloud.poses.size());
     }
 
   }
@@ -210,7 +211,7 @@
       }
 
       // Rik
-      double q = beamRangeFinderModel(scan, simulatedScan, sensor_pose, probs);
+      weights[i] = beamRangeFinderModel(scan, simulatedScan, sensor_pose, probs);
 
       // End Rik
 
@@ -227,18 +228,20 @@
       //   }
     }
   }
-/*
+
 
   std::vector <double> weights;
   double normalize;
   void normalizeWeights() {
+    ROS_INFO("B");
       for(unsigned int i = 0 ; i < weights.size() ; i++) {
           normalize += weights[i];
       }
       for(unsigned int i = 0 ; i < weights.size() ; i++) {
           weights[i] /= normalize;
       }
-  }*/
+      ROS_INFO("C");
+  }
   /**
    * This is where resampling should go, after applying the motion and
    * sensor models.
@@ -249,14 +252,14 @@
     const geometry_msgs::PoseArray& particleCloud )
   {
       ROS_INFO("A");
-      /*
+      
       int size = particleCloud.poses.size();
         geometry_msgs::PoseArray resampled;
         normalizeWeights();
         double remain = 0;
         int index = 0;
         
-        Stochastic Universal Sampling
+        // Stochastic Universal Sampling
 
         for(int i = 0 ; i < size ; i++) {
             double part = normalize/size;
@@ -264,7 +267,7 @@
                 geometry_msgs::Pose pose;
                 pose.position = particleCloud.poses[i].position;
                 pose.orientation = particleCloud.poses[i].orientation;
-                resampled.poses[index] = pose;
+                resampled.poses.push_back(pose);
                 if(index < size) {
                     index++;
                 }
@@ -276,9 +279,9 @@
 
             }
         }
-*/
-    //return resampled;
-    return this->particleCloud;
+
+    return resampled;
+    //return this->particleCloud;
   }
 
 
