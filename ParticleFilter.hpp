@@ -55,6 +55,23 @@ protected:
   virtual geometry_msgs::PoseWithCovariance updatePose();
 
   
+
+  // Added by Rik
+  double beamRangeFinderModel(
+      const sensor_msgs::LaserScan& scan, 
+      const sensor_msgs::LaserScan::Ptr& simulatedScan, 
+      geometry_msgs::Pose sensor_pose,
+      std::vector<double> probs);
+  double calculate_pHit(float zkt, float zkt_star, double sHit, double zMax);
+  double calculate_pShort(float zkt, float zkt_star, double lShort);
+  double calculate_pMax(float zkt, double zMax);
+  double calculate_pRand(float zkt, double zMax);
+  std::vector<double> learnIntrinsicParameters();
+  void normalizeWeights();
+
+private:
+  std::vector <double> weights;
+  double normalize;
 };
 
 #endif
