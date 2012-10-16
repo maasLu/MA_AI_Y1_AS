@@ -54,7 +54,7 @@ protected:
    */
   virtual geometry_msgs::PoseWithCovariance updatePose();
 
-  
+  double normal(double mu, double sigma);
 
   // Added by Rik
   double beamRangeFinderModel(

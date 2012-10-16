@@ -7,8 +7,6 @@
 #include <cstdlib>
 #include "vector"
 
-
-
  /**  
   * Just place all particles on a line along x=y. This should be
   * replaced with something more sensible, like drawing particles
@@ -57,10 +55,13 @@
       ROS_DEBUG( "applying odometry: %f %f %f", deltaX, deltaY, deltaT );
     for (unsigned int i = 0; i < particleCloud.poses.size(); ++i)
     {
-        double a1, a2, a3, a4 = 0.1;
+        double a1 = 0.1, a2 = 0.1, a3 = 0.1, a4 = 0.1;
+
+
         double x = particleCloud.poses[i].position.x;
         double y = particleCloud.poses[i].position.y;
         double t = particleCloud.poses[i].orientation.w;
+         ROS_INFO("Old orientation = %d", t);
         double xPrime = x + deltaX;
         double yPrime = y + deltaY;
         double tPrime = t + deltaT;
@@ -78,7 +79,8 @@
       //particleCloud.poses[i].position.y += deltaY;
         particleCloud.poses[i].position.x = xPrime;
         particleCloud.poses[i].position.y = yPrime;
-        particleCloud.poses[i].orientation.w = tPrime;
+        particleCloud.poses[i].orientation = tf::createQuaternionMsgFromYaw(tPrime);
+        ROS_INFO("New orientation = %d", particleCloud.poses[i].orientation.w);
 	}
   ROS_INFO("End motion model");
 }
@@ -123,10 +125,10 @@
       {
         q = q * p;
       }
-      ROS_INFO("k: [%d], \tp=[%f], \tq=[%f]",k, p, q);
+     // ROS_INFO("k: [%d], \tp=[%f], \tq=[%f]",k, p, q);
     }
     // return q
-    ROS_INFO("Return q = [%f]",q);
+   // ROS_INFO("Return q = [%f]",q);
     return q;
   }
 
@@ -138,7 +140,7 @@
       double breaker = -0.5 * (pow((zkt - zkt_star),2)/pow(sHit,2));
       double exponent = exp(breaker);
       double pHit = (1/(sqrt(2 * M_PI * pow(sHit,2)))) * exp(-0.5*((pow((zkt-zkt_star),2))/pow(sHit,2)));
-      // ROS_INFO("[%f], [%f], [%f], pHit = [%f]",squareRoot, breaker, exponent, pHit);
+       ROS_INFO("[%f], [%f], [%f], pHit = [%f]",squareRoot, breaker, exponent, pHit);
       return pHit;
     }
     // ROS_INFO("pHit = 0");
@@ -279,6 +281,31 @@
       }
       ROS_INFO("C");
   }
+
+
+//Source : http://www.dreamincode.net/code/snippet1446.htm
+
+  double normal(double mu, double sigma) {
+                 //        deviate from previous calculation
+        double polar, rsquared, var1, var2;
+       
+
+               
+                //        choose pairs of uniformly distributed deviates, discarding those
+                //        that don't fall within the unit circle
+                do {
+                        var1=2.0*( double(rand())/double(RAND_MAX) ) - 1.0;
+                        var2=2.0*( double(rand())/double(RAND_MAX) ) - 1.0;
+                        rsquared=var1*var1+var2*var2;
+                } while ( rsquared>=1.0 || rsquared == 0.0);
+               
+                //        calculate polar tranformation for each deviate
+                polar=sqrt(-2.0*log(rsquared)/rsquared);
+               
+                return var2*polar*sigma + mu;
+  }
+
+
   /**
    * This is where resampling should go, after applying the motion and
    * sensor models.
